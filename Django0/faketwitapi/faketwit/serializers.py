@@ -1,8 +1,20 @@
 from rest_framework import serializers
 from .models import Tweets
+from django.contrib.auth.models import User
 
 
-class TweetSerializer(serializers.Serializer):
+class TweetSerializer(serializers.HyperlinkedModelSerializer):
+    # We just want to display the owner username (read-only)
+    # We want to display the game cagory's name instead of the id
+
+    class Meta:
+        model = Tweets
+        fields = (
+                'tweet_text',
+                'date')
+
+
+'''class TweetSerializer(serializers.Serializer):
     pk = serializers.IntegerField(read_only=True)
     date = serializers.DateTimeField()
     tweet_text = serializers.CharField(max_length=250)
@@ -11,7 +23,7 @@ class TweetSerializer(serializers.Serializer):
         return Tweets.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
-        instance.tweet_text = validated_data.get('tweet_text', instance.tweet_text)
+        instance.tweet_text = validated_data.get('tweet_text', instance.tweet_text)'''
 
 
 '''class UserSerializer(serializers.Serializer):

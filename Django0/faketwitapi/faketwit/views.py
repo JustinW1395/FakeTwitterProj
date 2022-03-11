@@ -6,6 +6,10 @@ from rest_framework.parsers import JSONParser
 from rest_framework import status
 from .models import Tweets
 from .serializers import TweetSerializer
+from rest_framework import generics
+from rest_framework.response import Response
+from rest_framework.reverse import reverse
+from django.contrib.auth.models import User
 
 # Create your views here.
 
@@ -16,7 +20,12 @@ class JSONResponse(HttpResponse):
         kwargs['content_type'] = 'application/json'
         super(JSONResponse, self).__init__(content, **kwargs)
 
-@csrf_exempt
+class TweetList(generics.ListCreateAPIView):
+    queryset = Tweets.objects.all()
+    serializer_class = TweetSerializer
+    name = 'tweet-list'
+
+'''@csrf_exempt
 def tweet_list(request):
     if request.method == 'GET':
         tweets = Tweets.objects.all()
@@ -28,7 +37,7 @@ def tweet_list(request):
         if tweet_serializer.is_valid():
             tweet_serializer.save()
             return JSONResponse(tweet_serializer.data, status=status.HTTP_201_CREATED)
-        return JSONResponse(tweet_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return JSONResponse(tweet_serializer.errors, status=status.HTTP_400_BAD_REQUEST)'''
 
 @csrf_exempt
 def tweet_detail(request, pk):
@@ -49,6 +58,13 @@ def tweet_detail(request, pk):
     elif request.method == 'DELETE':
         tweet.delete()
         return HttpResponse(status=status.HTTP_204_NO_CONTENT)
+
+class ApiRoot(generics.GenericAPIView):
+    name = 'api-root'
+    def get(self, request, *args, **kwargs):
+        return Response({
+            'tweets': reverse(TweetList.name, request=request),
+            })
 
 
 '''@csrf_exempt
