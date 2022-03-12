@@ -128,6 +128,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = 'static/'
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': ( # This specifies a global setting with tuple of string for authentication        
+        'rest_framework.authentication.BasicAuthentication',        
+        'rest_framework.authentication.SessionAuthentication',        
+        )            # and an offset that specify the starting position of the Query
+}                             # The value for the PAGE_SIZE settings
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
