@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
+import environ 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -71,6 +72,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'faketwitapi.wsgi.application'
 
+# reading .env file
+env = environ.Env()
+environ.Env.read_env()
+
+# Raises django's ImproperlyConfigured exception if SECRET_KEY not in os.environ
+SECRET_KEY = env("SECRET_KEY")
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
@@ -79,16 +86,14 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         # Replace games with your desired database name 
-        'NAME': 'faketwit',
+        'NAME': env("DATABASE_NAME"),
         # Replace username with your desired user name        
-        'USER': 'postgres',
+        'USER': env("DATABASE_USER"),
         # Replace password with your desired password        
-        'PASSWORD': 'Friday13',
+        'PASSWORD': env("DATABASE_PASSWORD"),
         # Replace 127.0.0.1 with the PostgreSQL host        
-        'HOST': 'localhost', 
-        #Replace 5432 with the PostgreSQL configured port         
-        # case you aren't using the default port        
-        'PORT': '5432',
+        'HOST': env("DATABASE_HOST"),
+        'PORT': env("DATABASE_PORT"),
     }
 }
 
