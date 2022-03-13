@@ -6,7 +6,7 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 from rest_framework import status
 from .models import Tweets, Relations
-from .serializers import TweetSerializer, UserCreateSerializer, FollowSerializer
+from .serializers import TweetSerializer, UserCreateSerializer, FollowSerializer, UserSerializer, GETFollowTweetSerializer
 from django.contrib.auth.models import User
 from rest_framework import generics
 from rest_framework.permissions import AllowAny
@@ -83,6 +83,22 @@ class UserCreateDetail(generics.RetrieveAPIView):
     queryset = User.objects.all()
     serializer_class = UserCreateSerializer
     name = 'user-create-detail'
+
+class FollowTweetList(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    name = 'user-list'
+
+class UserList(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    name = 'user-list'
+
+
+class UserDetail(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    name = 'user-detail'
 
 class ApiRoot(generics.GenericAPIView):
     name = 'api-root'
