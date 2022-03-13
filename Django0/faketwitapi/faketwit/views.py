@@ -5,7 +5,12 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 from rest_framework import status
 from .models import Tweets
-from .serializers import TweetSerializer
+from .serializers import TweetSerializer, UserCreateSerializer
+from django.contrib.auth.models import User
+from rest_framework import generics
+from rest_framework.permissions import AllowAny
+from rest_framework.reverse import reverse
+from rest_framework.response import Response
 
 # Create your views here.
 
@@ -49,6 +54,26 @@ def tweet_detail(request, pk):
     elif request.method == 'DELETE':
         tweet.delete()
         return HttpResponse(status=status.HTTP_204_NO_CONTENT)
+
+class UserCreate(generics.ListCreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserCreateSerializer
+    permission_classes = (AllowAny, )
+    name = 'user-create'
+
+
+class UserCreateDetail(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserCreateSerializer
+    name = 'user-create-detail'
+
+class ApiRoot(generics.GenericAPIView):
+    name = 'api-root'
+    def get(self, request, *args, **kwargs):
+        return Response({
+            'signup':reverse(UserCreate.name, request=request),
+            })
+
 
 
 '''@csrf_exempt
