@@ -85,9 +85,9 @@ class UserCreateDetail(generics.RetrieveAPIView):
     name = 'user-create-detail'
 
 class FollowTweetList(generics.ListAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    name = 'user-list'
+    queryset = Tweets.objects.all()
+    serializer_class = GETFollowTweetSerializer
+    name = 'follow-tweet-list'
 
 class UserList(generics.ListAPIView):
     queryset = User.objects.all()
@@ -106,7 +106,9 @@ class ApiRoot(generics.GenericAPIView):
         return Response({
             'signup':reverse(UserCreate.name, request=request),
             'tweets': reverse(TweetList.name, request=request),
-            'follow':reverse(FollowList.name, request=request)
+            'follow':reverse(FollowList.name, request=request),
+            'feed':reverse(FollowTweetList.name, request=request),
+            'users':reverse(UserList.name, request=request),
             })
 
 
