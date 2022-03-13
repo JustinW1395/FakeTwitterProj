@@ -11,6 +11,12 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
+import environ
+
+env = environ.Env()
+# reading .env file
+environ.Env.read_env()
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -83,7 +89,7 @@ DATABASES = {
         # Replace username with your desired user name        
         'USER': 'postgres',
         # Replace password with your desired password        
-        'PASSWORD': 'Friday13',
+        'PASSWORD': env("DATABASE_PASSWORD"),
         # Replace 127.0.0.1 with the PostgreSQL host        
         'HOST': 'localhost', 
         #Replace 5432 with the PostgreSQL configured port         
