@@ -5,8 +5,8 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 from rest_framework import status
-from .models import Tweets
-from .serializers import TweetSerializer, UserCreateSerializer
+from .models import Tweets, Relations
+from .serializers import TweetSerializer, UserCreateSerializer, FollowSerializer
 from django.contrib.auth.models import User
 from rest_framework import generics
 from rest_framework.permissions import AllowAny
@@ -49,6 +49,28 @@ class TweetDetail(generics.RetrieveUpdateDestroyAPIView):
         permissions.IsAuthenticatedOrReadOnly,
         IsAuthorOrReadOnly)
 
+class FollowList(generics.ListCreateAPIView):
+    queryset = Relations.objects.all()
+    serializer_class = FollowSerializer
+    name = 'relations-list'
+
+    permission_classes = (
+        permissions.IsAuthenticatedOrReadOnly,
+        IsFollowOrReadOnly)
+
+    def perform_create(self, serializer):
+        # Pass an additional owner field to the create method
+        # To Set the owner to the user received in the request
+        serializer.save(follower=self.request.user)
+
+class FollowDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Relations.objects.all()
+    serializer_class = FollowSerializer
+    name = 'relations-detail'
+
+    permission_classes = (
+        permissions.IsAuthenticatedOrReadOnly,
+        IsFollowOrReadOnly)
 
 class UserCreate(generics.ListCreateAPIView):
     queryset = User.objects.all()
@@ -68,6 +90,7 @@ class ApiRoot(generics.GenericAPIView):
         return Response({
             'signup':reverse(UserCreate.name, request=request),
             'tweets': reverse(TweetList.name, request=request),
+            'follow':reverse(FollowList.name, request=request)
             })
 
 
