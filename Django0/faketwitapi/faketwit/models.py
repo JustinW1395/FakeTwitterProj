@@ -22,9 +22,22 @@ class Relations(models.Model):
         related_name='relations',
         on_delete=models.CASCADE)
     followed = models.ForeignKey(  
-        'auth.User',            
+        User,            
         related_name='followed',
         on_delete=models.CASCADE)
+    
+    def __unicode__(self):
+        return u"%s is following %s" % (self.follower.username, 
+            self.followed.username)
+    
+    def save(self, **kwargs):
+        """
+        A mostly-generic save method, except that it validates that the user
+        is not attempting to follow themselves.
+        """
+        if self.follower == self.followed:
+            raise ValueError("Cannot follow yourself.")
+        super(Relations, self).save(**kwargs)
 
     class Meta:
-        ordering = ('followed',)
+        unique_together = (('followed','follower'),)

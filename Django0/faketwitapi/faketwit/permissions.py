@@ -17,4 +17,4 @@ class IsFollowOrReadOnly(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return True
         else:
-            return obj.followed == request.user
+            return obj.follower == request.user

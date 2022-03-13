@@ -10,8 +10,29 @@ class UserTweetSerializer(serializers.HyperlinkedModelSerializer):
             'url',
             'tweet_text')
 
+class FollowSerializer(serializers.HyperlinkedModelSerializer):
+
+    follower = serializers.ReadOnlyField(source='follower.username')
+
+    followed = serializers.SlugRelatedField(queryset=User.objects.all(), slug_field='username')
+
+    class Meta:
+        model = Relations
+        fields = (
+                'url',
+                'follower',
+                'followed')
+
+class UserFollowSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Relations
+        fields = (
+                'url',
+                'followed')
+
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     tweets = UserTweetSerializer(many=True, read_only=True)
+    follow = UserFollowSerializer (many=True, read_only=True)
 
     class Meta:
         model = User
@@ -19,7 +40,8 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
             'url', 
             'pk',
             'username',
-            'tweets')
+            'tweets',
+            'follow')
 
 class TweetSerializer(serializers.HyperlinkedModelSerializer):
 
@@ -34,21 +56,19 @@ class TweetSerializer(serializers.HyperlinkedModelSerializer):
                 'date')
 
 
-class FollowSerializer(serializers.HyperlinkedModelSerializer):
+class GETFollowTweetSerializer(serializers.HyperlinkedModelSerializer):
 
-    followed = serializers.ReadOnlyField(source='followed.username')
-
-    follower = serializers.ReadOnlyField(source='follower.username')
-
-    users = UserSerializer(many=True, read_only=True)
+    author = serializers.ReadOnlyField(source='author.username')
 
     class Meta:
-        model = Relations
+        model = Tweets
         fields = (
                 'url',
-                'follower',
-                'followed',
-                'users')
+                'author',
+                'tweet_text',
+                'date')
+        
+
 
 class UserCreateSerializer(serializers.ModelSerializer):
 

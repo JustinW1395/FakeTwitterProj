@@ -6,7 +6,7 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 from rest_framework import status
 from .models import Tweets, Relations
-from .serializers import TweetSerializer, UserCreateSerializer, UserSerializer, FollowSerializer
+from .serializers import TweetSerializer, UserCreateSerializer, UserSerializer, FollowSerializer, GETFollowTweetSerializer
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
@@ -51,7 +51,7 @@ class FollowList(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         # Pass an additional owner field to the create method
         # To Set the owner to the user received in the request
-        serializer.save(followed=self.request.user)
+        serializer.save(follower=self.request.user)
 
 class FollowDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Relations.objects.all()
@@ -95,39 +95,11 @@ class UserCreateDetail(generics.RetrieveAPIView):
     serializer_class = UserCreateSerializer
     name = 'user-create-detail'
 
-'''@csrf_exempt
-def tweet_list(request):
-    if request.method == 'GET':
-        tweets = Tweets.objects.all()
-        tweet_serializer = TweetSerializer(tweets, many=True)
-        return JSONResponse(tweet_serializer.data)
-    elif request.method == 'POST':
-        tweet_data = JSONParser().parse(request)
-        tweet_serializer = TweetSerializer(data=tweet_data)
-        if tweet_serializer.is_valid():
-            tweet_serializer.save()
-            return JSONResponse(tweet_serializer.data, status=status.HTTP_201_CREATED)
-        return JSONResponse(tweet_serializer.errors, status=status.HTTP_400_BAD_REQUEST)'''
+class FollowTweetList(generics.ListAPIView):
+    queryset = Tweets.objects.all()
+    serializer_class = GETFollowTweetSerializer
+    name = 'follow-tweet-list'
 
-@csrf_exempt
-def tweet_detail(request, pk):
-    try:
-        tweet = Tweets.objects.get(pk=pk)
-    except Tweets.DoesNotExist:
-        return HttpResponse(status=status.HTTP_404_NOT_FOUND)
-    if request.method == 'GET':
-        tweet_serializer = TweetSerializer(tweet)
-        return JSONResponse(tweet_serializer.data)
-    elif request.method == 'PUT':
-        tweet_data = JSONParser().parse(request)
-        tweet_serializer = TweetSerializer(tweet, data=tweet_data)
-        if tweet_serializer.is_valid():
-            tweet_serializer.save()
-            return JSONResponse(tweet_serializer.data)
-        return JSONResponse(tweet_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    elif request.method == 'DELETE':
-        tweet.delete()
-        return HttpResponse(status=status.HTTP_204_NO_CONTENT)
 
 class ApiRoot(generics.GenericAPIView):
     name = 'api-root'
@@ -136,20 +108,9 @@ class ApiRoot(generics.GenericAPIView):
             'tweets': reverse(TweetList.name, request=request),
             'signup':reverse(UserCreate.name, request=request),
             'users':reverse(UserList.name, request=request),
-            'follow':reverse(FollowList.name, request=request)
+            'follow':reverse(FollowList.name, request=request),
+            'feed':reverse(FollowTweetList.name, request=request)
             })
 
 
-'''@csrf_exempt
-def tweet_list(request):
-    if request.method == 'GET':
-        tweets = Tweet.objects.all()
-        tweet_serializer = TweetSerializer(tweets, many=True)
-        return JSONResponse(tweet_serializer.data)
-    elif request.method == 'POST':
-        tweet_data = JSONParser().parse(request)
-        tweet_serializer = TweetSerializer(data=tweet_data)
-        if tweet_serializer.is_valid():
-            tweet_serializer.save()
-            return JSONResponse(tweet_serializer.data, status=status.HTTP_201_CREATED)
-        return JSONResponse(tweet_serializer.errors, status=status.HTTP_400_BAD_REQUEST)'''
+
