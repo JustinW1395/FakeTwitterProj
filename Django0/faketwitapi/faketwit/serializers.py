@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from .models import Tweets
+from django.contrib.auth.models import User
+
 
 
 class TweetSerializer(serializers.Serializer):
@@ -12,6 +14,20 @@ class TweetSerializer(serializers.Serializer):
 
     def update(self, instance, validated_data):
         instance.tweet_text = validated_data.get('tweet_text', instance.tweet_text)
+
+class UserCreateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ('username', 'password', 'email')
+        extra_kwargs = {'password': {'write_only': True}}
+
+    def create(self, validated_data):
+        password = validated_data.pop('password')
+        user = User(**validated_data)
+        user.set_password(password)
+        user.save()
+        return user
 
 
 '''class UserSerializer(serializers.Serializer):
