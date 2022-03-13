@@ -12,6 +12,12 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 from pathlib import Path
 
+import environ
+
+env = environ.Env()
+# reading .env file
+environ.Env.read_env()
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -21,6 +27,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-*vel$*&^sb+=t^m=hew55d7_^wlrua-^&pr6b_%)9v0p1s3o9g'
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -83,7 +90,7 @@ DATABASES = {
         # Replace username with your desired user name        
         'USER': 'postgres',
         # Replace password with your desired password        
-        'PASSWORD': 'Friday13',
+        'PASSWORD': env("DATABASE_PASSWORD"),
         # Replace 127.0.0.1 with the PostgreSQL host        
         'HOST': 'localhost', 
         #Replace 5432 with the PostgreSQL configured port         
@@ -91,6 +98,7 @@ DATABASES = {
         'PORT': '5432',
     }
 }
+
 
 
 # Password validation
