@@ -11,10 +11,10 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
-import environ
+import environ 
 
+# Set up env
 env = environ.Env()
-# reading .env file
 environ.Env.read_env()
 
 
@@ -77,6 +77,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'faketwitapi.wsgi.application'
 
+# reading .env file
+env = environ.Env()
+environ.Env.read_env()
+
+# Raises django's ImproperlyConfigured exception if SECRET_KEY not in os.environ
+SECRET_KEY = env("SECRET_KEY")
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
@@ -91,9 +97,7 @@ DATABASES = {
         # Replace password with your desired password        
         'PASSWORD': env("DATABASE_PASSWORD"),
         # Replace 127.0.0.1 with the PostgreSQL host        
-        'HOST': 'localhost', 
-        #Replace 5432 with the PostgreSQL configured port         
-        # case you aren't using the default port        
+        'HOST': 'localhost',
         'PORT': '5432',
     }
 }
@@ -134,6 +138,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = 'static/'
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': ( # This specifies a global setting with tuple of string for authentication        
+        'rest_framework.authentication.BasicAuthentication',        
+        'rest_framework.authentication.SessionAuthentication',        
+        )            # and an offset that specify the starting position of the Query
+} 
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
