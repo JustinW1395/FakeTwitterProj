@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Tweets
 from django.contrib.auth.models import User
+from .models import Tweets, Relations
 
 
 
@@ -30,3 +31,15 @@ class UserCreateSerializer(serializers.ModelSerializer):
         user.save()
         return user
 
+class FollowSerializer(serializers.HyperlinkedModelSerializer):
+
+    follower = serializers.ReadOnlyField(source='follower.username')
+
+    followed = serializers.SlugRelatedField(queryset=User.objects.all(), slug_field='username')
+
+    class Meta:
+        model = Relations
+        fields = (
+                'url',
+                'follower',
+                'followed')
