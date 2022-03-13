@@ -6,7 +6,7 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 from rest_framework import status
 from .models import Tweets, Relations
-from .serializers import TweetSerializer, UserCreateSerializer, FollowSerializer
+from .serializers import TweetSerializer, UserCreateSerializer, FollowSerializer, UserSerializer, GETFollowTweetSerializer
 from django.contrib.auth.models import User
 from rest_framework import generics
 from rest_framework.permissions import AllowAny
@@ -84,13 +84,31 @@ class UserCreateDetail(generics.RetrieveAPIView):
     serializer_class = UserCreateSerializer
     name = 'user-create-detail'
 
+class FollowTweetList(generics.ListAPIView):
+    queryset = Tweets.objects.all()
+    serializer_class = GETFollowTweetSerializer
+    name = 'follow-tweet-list'
+
+class UserList(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    name = 'user-list'
+
+
+class UserDetail(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    name = 'user-detail'
+
 class ApiRoot(generics.GenericAPIView):
     name = 'api-root'
     def get(self, request, *args, **kwargs):
         return Response({
             'signup':reverse(UserCreate.name, request=request),
             'tweets': reverse(TweetList.name, request=request),
-            'follow':reverse(FollowList.name, request=request)
+            'follow':reverse(FollowList.name, request=request),
+            'feed':reverse(FollowTweetList.name, request=request),
+            'users':reverse(UserList.name, request=request),
             })
 
 
