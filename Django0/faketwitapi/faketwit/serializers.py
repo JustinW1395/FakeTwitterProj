@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from .models import Tweets
 from django.contrib.auth.models import User
 from .models import Tweets, Relations
 

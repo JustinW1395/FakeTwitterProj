@@ -6,7 +6,7 @@ class Tweets(models.Model):
     author = models.ForeignKey(  
         'auth.User',            
         related_name='tweets',
-        on_delete=models.CASCADE)
+        on_delete=models.CASCADE,)
     tweet_text = models.CharField(max_length=250)
     date = models.DateTimeField(auto_now_add=True)
 
