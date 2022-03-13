@@ -77,12 +77,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'faketwitapi.wsgi.application'
 
-# reading .env file
-env = environ.Env()
-environ.Env.read_env()
-
-# Raises django's ImproperlyConfigured exception if SECRET_KEY not in os.environ
-SECRET_KEY = env("SECRET_KEY")
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
