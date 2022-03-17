@@ -1,4 +1,6 @@
+from cgitb import lookup
 import imp
+from urllib import request
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -14,6 +16,7 @@ from rest_framework.reverse import reverse
 from rest_framework.response import Response
 from rest_framework import permissions
 from .permissions import IsAuthorOrReadOnly, IsFollowOrReadOnly
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 # Create your views here.
 
@@ -84,8 +87,19 @@ class UserCreateDetail(generics.RetrieveAPIView):
     serializer_class = UserCreateSerializer
     name = 'user-create-detail'
 
-class FollowTweetList(generics.ListAPIView):
-    queryset = Tweets.objects.all()
+class FollowTweetList(LoginRequiredMixin, generics.ListAPIView):
+    
+    permission_classes = (
+        permissions.IsAuthenticatedOrReadOnly,
+        IsFollowOrReadOnly)
+    def get_queryset(self):
+        logged_user = self.request.user
+        followed = Relations.objects.filter(follower_id=logged_user).values('followed_id')
+        followed_ids = []
+        for item in followed:
+            followed_ids.append(item['followed_id'])
+        lookup = {'author_id__in': followed_ids}
+        return Tweets.objects.filter(**lookup)
     serializer_class = GETFollowTweetSerializer
     name = 'follow-tweet-list'
 
@@ -110,19 +124,3 @@ class ApiRoot(generics.GenericAPIView):
             'feed':reverse(FollowTweetList.name, request=request),
             'users':reverse(UserList.name, request=request),
             })
-
-
-
-'''@csrf_exempt
-def tweet_list(request):
-    if request.method == 'GET':
-        tweets = Tweet.objects.all()
-        tweet_serializer = TweetSerializer(tweets, many=True)
-        return JSONResponse(tweet_serializer.data)
-    elif request.method == 'POST':
-        tweet_data = JSONParser().parse(request)
-        tweet_serializer = TweetSerializer(data=tweet_data)
-        if tweet_serializer.is_valid():
-            tweet_serializer.save()
-            return JSONResponse(tweet_serializer.data, status=status.HTTP_201_CREATED)
-        return JSONResponse(tweet_serializer.errors, status=status.HTTP_400_BAD_REQUEST)'''
