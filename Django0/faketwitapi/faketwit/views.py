@@ -1,4 +1,6 @@
+from cgitb import lookup
 import imp
+from urllib import request
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -85,7 +87,18 @@ class UserCreateDetail(generics.RetrieveAPIView):
     name = 'user-create-detail'
 
 class FollowTweetList(generics.ListAPIView):
-    queryset = Tweets.objects.all()
+    
+    permission_classes = (
+        permissions.IsAuthenticatedOrReadOnly,
+        IsFollowOrReadOnly)
+    def get_queryset(self):
+        logged_user = self.request.user
+        followed = Relations.objects.filter(follower_id=logged_user).values('followed_id')
+        followed_ids = []
+        for item in followed:
+            followed_ids.append(item['followed_id'])
+        lookup = {'author_id__in': followed_ids}
+        return Tweets.objects.filter(**lookup)
     serializer_class = GETFollowTweetSerializer
     name = 'follow-tweet-list'
 
